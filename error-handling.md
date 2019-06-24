@@ -29,11 +29,11 @@ For each thing that could go wrong, make a test with your expected status code a
 
 ### GET `/not-a-route`
 
-- Status:
+- Status: 404
 
 ### PATCH / PUT / POST / DELETE... `/api/articles` etc...
 
-- Status:
+- Status: 405
 
 ---
 
@@ -41,7 +41,7 @@ For each thing that could go wrong, make a test with your expected status code a
 
 ### GET `/api/topics`
 
-- ?
+- Status: 200
 
 ### GET `/api/articles`
 
@@ -49,27 +49,50 @@ For each thing that could go wrong, make a test with your expected status code a
   - `sort_by` a column that doesn't exist
   - `order` !== "asc" / "desc"
   - `author` / `topic` that is not in the database
+
+- Status: 400
+
   - `author` / `topic` that exists but does not have any articles associated with it
+
+- Status: 404
 
 ### GET `/api/articles/:article_id`
 
 - Bad `article_id` (e.g. `/dog`)
+
+- Status: 400
+
 - Well formed `article_id` that doesn't exist in the database (e.g. `/999999`)
+
+- Status: 404
 
 ### PATCH `/api/articles/:article_id`
 
 - No `inc_votes` on request body
 - Invalid `inc_votes` (e.g. `{ inc_votes : "cat" }`)
 - Some other property on request body (e.g. `{ inc_votes : "cat", name: 'Mitch' }`)
+ - Status: 400
 
 ### GET `/api/articles/:article_id/comments`
 
+- Status: 200
+
 ### POST `/api/articles/:article_id/comments`
+
+- Status: 201
 
 ### PATCH `/api/comments/:comment_id`
 
+- Status: 200
+
 ### DELETE `/api/comments/:comment_id`
+
+- Status: 200
 
 ### GET `/api/users/:username`
 
+- Status: 200
+
 ### GET `/api`
+
+- Status: 200

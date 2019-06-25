@@ -8,4 +8,10 @@ exports.makeRefObj = (list, key = 'title', value = 'article_id') => {
     }, {});
 };
 
-exports.formatComments = (comments, articleRef) => {};
+exports.formatComments = (comments, articleRef) => {
+    return comments.map(({ created_by, belongs_to, ...newObj }) => {
+        newObj.author = created_by;
+        newObj.article_id = articleRef[belongs_to];
+        return newObj;
+    });
+};

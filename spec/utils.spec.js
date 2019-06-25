@@ -92,4 +92,8 @@ describe('formatComments', () => {
     expect(formatComments(arr, refObj)[0].article_id).to.equal(12);
     expect(formatComments(arr, refObj)[1].article_id).to.equal(3);
   });
+  it('returns an array of objects with the property created_at converted to a Date object', () => {
+    expect(formatComments(arr, refObj)[0].created_at).to.be.an.instanceof(Date);
+    expect(formatComments(arr, refObj)[1].created_at).to.be.an.instanceof(Date);
+  });
 });

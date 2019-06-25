@@ -51,7 +51,12 @@ describe('/api/topics', () => {
 
 describe('/api/users/:username', () => {
   describe('GET', () => {
-    //test
+    it('responds with status 200', () => {
+      return request
+        .get('/api/users/butter_bridge')
+        .expect(200)
+        // Check response body here!
+    });
   });
 //   describe('disallowed methods', () => {
 //     it('responds with status 405', () => {

@@ -5,7 +5,7 @@ const chai = require('chai');
 chai.use(require('chai-sorted'));
 const { expect } = chai;
 const knex = require('../connection');
-const { topicData } = require('../db');
+const { topicData, userData } = require('../db');
 
 beforeEach(() => {
   return knex.seed.run();
@@ -55,7 +55,9 @@ describe('/api/users/:username', () => {
       return request
         .get('/api/users/butter_bridge')
         .expect(200)
-        // Check response body here!
+        .then(({ body: { user } }) => {
+          expect(user).to.deep.equal(userData[0]);
+        });
     });
   });
 //   describe('disallowed methods', () => {

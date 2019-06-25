@@ -1,7 +1,6 @@
 const router = require('express').Router();
-const { sendUserById } = require('../controllers/users');
+const { sendUserByUsername } = require('../controllers/users');
 
-router.route('/:username')
-.get(sendUserById);
+router.route('/:username').get(sendUserByUsername);
 
 module.exports = router;

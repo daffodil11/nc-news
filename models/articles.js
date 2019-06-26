@@ -34,8 +34,17 @@ exports.updateArticle = (article_id, inc_votes) => {
 };
 
 exports.fetchArticleComments = article_id => {
-  const columns = ['comment_id', 'author', 'votes', 'created_at', 'body'];
-  return knex('comments')
+  if (/\D/.test(article_id)) {
+    return Promise.reject({ status: 400, msg: 'Invalid article_id' });
+  }
+  const columns = ['comment_id', 'author', 'votes', 'created_at', 'body'].map(col => `comments.${col}`);
+  return knex('articles')
     .select(...columns)
-    .where('article_id', '=', article_id);
+    .leftJoin('comments', 'articles.article_id', 'comments.article_id')
+    .where('articles.article_id', '=', article_id)
+    .then(rows => {
+        if (!rows.length) return Promise.reject({ status: 404, msg: 'Not found' });
+        else if (Object.values(rows[0]).every(val => val == null)) return [];
+        else return rows;
+    });
 };

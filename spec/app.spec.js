@@ -222,6 +222,24 @@ describe('/api/articles', () => {
           expect(comments.length).to.equal(2);
         });
       });
+      it('status:200 responds with an empty array if an article has no comments', () => {
+        return request
+        .get('/api/articles/2/comments')
+        .expect(200)
+        .then(({ body: { comments } }) => {
+          expect(comments).to.deep.equal([]);
+        });
+      });
+      it('status:404 non-existent article_id', () => {
+        return request
+        .get('/api/articles/100/comments')
+        .expect(404);
+      });
+      it('status:400 invalid article_id', () => {
+        return request
+        .get('/api/articles/pizza/comments')
+        .expect(400);
+      });
     });
     describe('GET with queries', () => {
       //test

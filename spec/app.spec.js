@@ -77,6 +77,16 @@ describe('/api/articles', () => {
   beforeEach(() => {
     return knex.seed.run();
   });
+  const articleKeys = [
+    'article_id',
+    'title',
+    'body',
+    'votes',
+    'topic',
+    'author',
+    'created_at',
+    'comment_count'
+  ];
   describe('/', () => {
     describe('GET', () => {
       it('status:200', () => {
@@ -85,17 +95,7 @@ describe('/api/articles', () => {
           .expect(200)
           .then(({ body: { articles } }) => {
             // Shallow test whole array
-            const keys = [
-              'article_id',
-              'title',
-              'body',
-              'votes',
-              'topic',
-              'author',
-              'created_at',
-              'comment_count'
-            ];
-            articles.every(article => expect(article).to.have.keys(...keys));
+            articles.every(article => expect(article).to.have.keys(...articleKeys));
 
             //Thorough test of sample object
             const testArt = articles.find(
@@ -126,14 +126,20 @@ describe('/api/articles', () => {
           .get('/api/articles/5')
           .expect(200)
           .then(({ body: { article } }) => {
-            expect(article.title).to.equal('UNCOVERED: catspiracy to bring down democracy');
+            expect(article).to.have.keys(...articleKeys);
+            expect(article.title).to.equal(
+              'UNCOVERED: catspiracy to bring down democracy'
+            );
             expect(article.topic).to.equal('cats');
             expect(article.votes).to.equal(0);
             expect(article.comment_count).to.equal(2);
           });
       });
       it('status:404 if no article with given article_id exists', () => {
-        //test
+        return request.get('/api/articles/100').expect(404);
+      });
+      it('status:400 if invalid article_id is given', () => {
+        return request.get('/api/articles/mitch').expect(400);
       });
     });
     describe('PATCH', () => {

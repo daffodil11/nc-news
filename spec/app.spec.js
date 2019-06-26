@@ -59,17 +59,22 @@ describe('/api/users/:username', () => {
           expect(user).to.deep.equal(userData[0]);
         });
     });
+    it('responds with status 404 if the user does not exist', () => {
+      return request
+        .get('/api/users/nemo')
+        .expect(404);
+    });
   });
-//   describe('disallowed methods', () => {
-//     it('responds with status 405', () => {
-//       const methods = ['post', 'patch', 'put', 'del'];
-//       return Promise.all(
-//         methods.map(method => {
-//           return request[method]('/api/users/1').expect(405);
-//         })
-//       );
-//     });
-//   });
+  describe('disallowed methods', () => {
+    it('responds with status 405', () => {
+      const methods = ['post', 'patch', 'put', 'del'];
+      return Promise.all(
+        methods.map(method => {
+          return request[method]('/api/users/1').expect(405);
+        })
+      );
+    });
+  });
 });
 
 describe('/api/articles', () => {

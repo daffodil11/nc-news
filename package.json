@@ -4,10 +4,10 @@
   "description": "bc-nc-news",
   "main": "index.js",
   "scripts": {
-    "seed": "knex seed:run",
+    "seed": "LOG_SQL=true knex seed:run",
     "test-utils": "mocha spec/utils.spec.js",
     "test": "NODE_ENV=test mocha spec/app.spec.js",
-    "seed-test": "NODE_ENV=test knex seed:run"
+    "seed-test": "NODE_ENV=test LOG_SQL=true knex seed:run"
   },
   "repository": {
     "type": "git",

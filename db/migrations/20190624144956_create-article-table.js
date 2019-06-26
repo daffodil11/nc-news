@@ -1,6 +1,6 @@
 
 exports.up = function(knex, Promise) { 
-    return knex.schema.createTable('articles', articleTable => {
+    const create = knex.schema.createTable('articles', articleTable => {
         articleTable.increments('article_id');
         articleTable.string('title').notNullable().unique();
         articleTable.text('body').notNullable();
@@ -8,7 +8,9 @@ exports.up = function(knex, Promise) {
         articleTable.string('topic').references('slug').inTable('topics');
         articleTable.string('author').references('username').inTable('users');
         articleTable.timestamp('created_at').defaultTo(knex.fn.now());
-    })
+    });
+    if (process.env.LOG_SQL === 'true') console.log(create.toString());
+    return create;
 };
 
 exports.down = function(knex, Promise) {

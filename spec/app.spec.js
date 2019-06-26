@@ -89,13 +89,15 @@ describe('/api/articles', () => {
   ];
   describe('/', () => {
     describe('GET', () => {
-      it('status:200', () => {
+      it('status:200 responds with array of article objects', () => {
         return request
           .get('/api/articles')
           .expect(200)
           .then(({ body: { articles } }) => {
             // Shallow test whole array
-            articles.every(article => expect(article).to.have.keys(...articleKeys));
+            articles.every(article =>
+              expect(article).to.have.keys(...articleKeys)
+            );
 
             //Thorough test of sample object
             const testArt = articles.find(
@@ -121,7 +123,7 @@ describe('/api/articles', () => {
   });
   describe('/:article_id', () => {
     describe('GET', () => {
-      it('status:200', () => {
+      it('status:200 responds with article object', () => {
         return request
           .get('/api/articles/5')
           .expect(200)
@@ -143,10 +145,61 @@ describe('/api/articles', () => {
       });
     });
     describe('PATCH', () => {
-      //test
+      it('status:200 changes vote value and responds with updated article object', () => {
+        return request
+          .patch('/api/articles/5')
+          .send({ inc_votes: 1 })
+          .expect(200)
+          .then(({ body: { article } }) => {
+            expect(article.votes).to.equal(1);
+          });
+      });
+      it('status:200 can decrement a vote value', () => {
+        return request
+          .patch('/api/articles/5')
+          .send({ inc_votes: -4 })
+          .expect(200)
+          .then(({ body: { article } }) => {
+            expect(article.votes).to.equal(-4);
+          });
+      });
+      it('status:200 ignores extra data', () => {
+        return request
+          .patch('/api/articles/5')
+          .send({ inc_votes: -4, comment: 'your article is bad and you should feel bad' })
+          .expect(200)
+          .then(({ body: { article } }) => {
+            expect(article.votes).to.equal(-4);
+          });
+      });
+      it('status:422 non-existent id', () => {
+        return request
+          .patch('/api/articles/100')
+          .send({ inc_votes: 1 })
+          .expect(422);
+      });
+      it('status:400 missing data', () => {
+        return request
+          .patch('/api/articles/5')
+          .send({})
+          .expect(400);
+      });
+      it('status:400 wrong data type', () => {
+        return request
+          .patch('/api/articles/5')
+          .send({ inc_votes: 'wow, nice article, good job' })
+          .expect(400);
+      });
     });
     describe('disallowed methods', () => {
-      //test
+      it('status:405', () => {
+        const methods = ['post', 'put', 'del'];
+        return Promise.all(
+          methods.map(method => {
+            return request[method]('/api/articles/3').expect(405);
+          })
+        );
+      });
     });
   });
   describe('/:article_id/comments', () => {

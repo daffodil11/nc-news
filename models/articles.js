@@ -8,10 +8,27 @@ exports.fetchArticles = () => {
     .groupBy('articles.article_id');
 };
 
+const _fetchArticleById = article_id => {
+  if (/\D/.test(article_id)) {
+    return Promise.reject({ status: 400, msg: 'Invalid article_id' });
+  }
+  return this.fetchArticles().where('articles.article_id', '=', article_id);
+};
+
 exports.fetchArticleById = article_id => {
-    if (/\D/.test(article_id)) return Promise.reject({ status: 400, msg: 'Invalid article_id'});
-    return this.fetchArticles().where('articles.article_id', '=', article_id).then(rows => {
+  return _fetchArticleById(article_id).then(rows => {
+    if (rows.length) return rows[0];
+    else return Promise.reject({ status: 404, msg: 'Article not found' });
+  });
+};
+
+exports.updateArticle = (article_id, inc_votes) => {
+  if (!inc_votes || !Number.isInteger(inc_votes)) return Promise.reject({ status: 400, msg: 'Bad request'});
+  return _fetchArticleById(article_id)
+    .increment('votes', inc_votes)
+    .returning('*')
+    .then(rows => {
         if (rows.length) return rows[0];
-        else return Promise.reject({ status: 404, msg: 'Article not found'});
+        else return Promise.reject({ status: 422, msg: 'Unprocessable: article_id not found' });
     });
 };

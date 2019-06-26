@@ -32,3 +32,10 @@ exports.updateArticle = (article_id, inc_votes) => {
         else return Promise.reject({ status: 422, msg: 'Unprocessable: article_id not found' });
     });
 };
+
+exports.fetchArticleComments = article_id => {
+  const columns = ['comment_id', 'author', 'votes', 'created_at', 'body'];
+  return knex('comments')
+    .select(...columns)
+    .where('article_id', '=', article_id);
+};

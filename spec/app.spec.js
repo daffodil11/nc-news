@@ -16,7 +16,9 @@ describe('/api/badroute', () => {
     const methods = ['get', 'post', 'put', 'patch', 'del'];
     return Promise.all(
       methods.map(method => {
-        return request[method]('/api/badroute').expect(404);
+        return request[method]('/api/badroute').expect(404).then(({ body }) => {
+          expect(body.msg).to.equal('Not found');
+        });
       })
     );
   });
@@ -87,7 +89,7 @@ describe('/api/articles', () => {
     'created_at',
     'comment_count'
   ];
-  describe('/', () => {
+  xdescribe('/', () => {
     describe('GET', () => {
       it('status:200 responds with array of article objects', () => {
         return request
@@ -121,7 +123,7 @@ describe('/api/articles', () => {
       });
     });
   });
-  describe('/:article_id', () => {
+  xdescribe('/:article_id', () => {
     describe('GET', () => {
       it('status:200 responds with article object', () => {
         return request
@@ -202,9 +204,24 @@ describe('/api/articles', () => {
       });
     });
   });
+  const commentKeys = [
+    'comment_id',
+    'votes',
+    'created_at',
+    'author',
+    'body'
+  ];
   describe('/:article_id/comments', () => {
     describe('GET', () => {
-      //test
+      it('status:200 responds with array of comment objects', () => {
+        return request
+        .get('/api/articles/5/comments')
+        .expect(200)
+        .then(({ body: { comments } }) => {
+          comments.every(comment => expect(comment).to.have.keys(...commentKeys));
+          expect(comments.length).to.equal(2);
+        });
+      });
     });
     describe('GET with queries', () => {
       //test

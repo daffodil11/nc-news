@@ -402,10 +402,37 @@ describe('/api/articles', () => {
         });
       });
       it('status:400 only accepts comments from registered users', () => {
-        //test
-      })
+        return request
+        .post('/api/articles/1/comments')
+        .send({username: 'nemo', body: 'Damn fine cup of coffee!'})
+        .expect(400);
+      });
+      it('status:400 only accepts comments on an existing article', () => {
+        return request
+        .post('/api/articles/100/comments')
+        .send({username: 'lurker', body: 'Damn fine cup of coffee!'})
+        .expect(404);
+      });
+      it('status:400 invalid article id', () => {
+        return request
+        .post('/api/articles/gaaaarrr/comments')
+        .send({username: 'lurker', body: 'Damn fine cup of coffee!'})
+        .expect(400);
+      });
+      it('status:400 missing data', () => {
+        return request
+        .post('/api/articles/1/comments')
+        .send({username: 'lurker'})
+        .expect(400);
+      });
+      it('status:201 ignores extra data', () => {
+        return request
+        .post('/api/articles/1/comments')
+        .send({username: 'lurker', body: 'Damn fine cup of coffee!', greeting: 'Hello!'})
+        .expect(201);
+      });
     });
-    describe.only('disallowed methods', () => {
+    describe('disallowed methods', () => {
       it('status:405', () => {
         const methods = ['patch', 'put', 'del'];
         return Promise.all(

@@ -1,6 +1,14 @@
 const knex = require('../connection');
 const { validateOrderKey } = require('../db/utils/utils');
 
+const _fetchArticles = (columns) => {
+    return knex('articles')
+      .select(...columns)
+      .count('comments.comment_id as comment_count')
+      .leftJoin('comments', 'articles.article_id', 'comments.article_id')
+      .groupBy('articles.article_id');
+}
+
 exports.fetchArticles = ({ sort_by, order, author }) => {
   const columns = [
     'article_id',
@@ -15,11 +23,7 @@ exports.fetchArticles = ({ sort_by, order, author }) => {
     : 'articles.created_at';
   const sortOrder = order === 'asc' ? 'asc' : 'desc';
   return validateOrderKey(orderKey, [...columns, 'comment_count']).then(() => {
-    return knex('articles')
-      .select(...columns)
-      .count('comments.comment_id as comment_count')
-      .leftJoin('comments', 'articles.article_id', 'comments.article_id')
-      .groupBy('articles.article_id')
+    return _fetchArticles(columns)
       .orderBy(orderKey, sortOrder)
       .modify(query => {
         if (author) query.where('articles.author', '=', author);
@@ -28,10 +32,19 @@ exports.fetchArticles = ({ sort_by, order, author }) => {
 };
 
 const _fetchArticleById = article_id => {
+  const columns = [
+    'article_id',
+    'topic',
+    'title',
+    'author',
+    'votes',
+    'created_at',
+    'body'
+  ].map(col => `articles.${col}`);
   if (/\D/.test(article_id)) {
     return Promise.reject({ status: 400, msg: 'Invalid article_id' });
   }
-  return this.fetchArticles().where('articles.article_id', '=', article_id);
+  return _fetchArticles(columns).where('articles.article_id', '=', article_id);
 };
 
 exports.fetchArticleById = article_id => {

@@ -188,14 +188,14 @@ describe('/api/articles', () => {
       });
     });
   });
-  xdescribe('/:article_id', () => {
+  describe('/:article_id', () => {
     describe('GET', () => {
       it('status:200 responds with article object', () => {
         return request
           .get('/api/articles/5')
           .expect(200)
           .then(({ body: { article } }) => {
-            expect(article).to.have.keys(...articleKeys);
+            expect(article).to.have.keys(...articleKeys, 'body');
             expect(article.title).to.equal(
               'UNCOVERED: catspiracy to bring down democracy'
             );
@@ -219,7 +219,7 @@ describe('/api/articles', () => {
           .expect(200)
           .then(({ body: { article } }) => {
             expect(article.votes).to.equal(1);
-            expect(article).to.have.keys(...articleKeys);
+            expect(article).to.have.keys(...articleKeys, 'body');
           });
       });
       it('status:200 can decrement a vote value', () => {
@@ -277,7 +277,7 @@ describe('/api/articles', () => {
     'author',
     'body'
   ];
-  xdescribe('/:article_id/comments', () => {
+  describe('/:article_id/comments', () => {
     describe('GET', () => {
       it('status:200 responds with array of comment objects', () => {
         return request

@@ -230,6 +230,14 @@ describe('/api/articles', () => {
           expect(comments).to.deep.equal([]);
         });
       });
+      it('status:200 default sort is created_at descending', () => {
+        return request
+        .get('/api/articles/5/comments')
+        .expect(200)
+        .then(({ body: { comments } }) => {
+          expect(comments).to.be.descendingBy('created_at');
+        });
+      })
       it('status:404 non-existent article_id', () => {
         return request
         .get('/api/articles/100/comments')
@@ -242,7 +250,14 @@ describe('/api/articles', () => {
       });
     });
     describe('GET with queries', () => {
-      //test
+      it('status:200 responds with array of comment objects sorted by specified value', () => {
+        return request
+        .get('/api/articles/1/comments?sort_by=votes')
+        .expect(200)
+        .then(({ body: { comments } }) => {
+          expect(comments).to.be.descendingBy('votes');
+        })
+      });
     });
     describe('POST', () => {
       //test

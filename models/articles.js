@@ -24,9 +24,12 @@ exports.fetchArticleById = article_id => {
 
 exports.updateArticle = (article_id, inc_votes) => {
   if (!inc_votes || !Number.isInteger(inc_votes)) return Promise.reject({ status: 400, msg: 'Bad request'});
-  return _fetchArticleById(article_id)
+  return knex('articles')
+    .where('articles.article_id', '=', article_id)
     .increment('votes', inc_votes)
-    .returning('*')
+    .then(() => {
+      return _fetchArticleById(article_id);
+    })
     .then(rows => {
         if (rows.length) return rows[0];
         else return Promise.reject({ status: 422, msg: 'Unprocessable: article_id not found' });

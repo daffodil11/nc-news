@@ -123,7 +123,7 @@ describe('/api/articles', () => {
       });
     });
   });
-  xdescribe('/:article_id', () => {
+  describe('/:article_id', () => {
     describe('GET', () => {
       it('status:200 responds with article object', () => {
         return request
@@ -154,6 +154,7 @@ describe('/api/articles', () => {
           .expect(200)
           .then(({ body: { article } }) => {
             expect(article.votes).to.equal(1);
+            expect(article).to.have.keys(...articleKeys);
           });
       });
       it('status:200 can decrement a vote value', () => {

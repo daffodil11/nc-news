@@ -40,8 +40,14 @@ exports.updateCommentVotes = (comment_id, { inc_votes }) => {
 };
 
 exports.deleteComment = comment_id => {
+  if (/\D/.test(comment_id)) {
+    return Promise.reject({ status: 400, msg: 'Invalid comment_id' });
+  }
   return knex('comments')
   .where('comment_id', '=', comment_id)
-  // .del()
-  // .returning('*');
+  .del()
+  .returning('*')
+  .then(rows => {
+    if (!rows.length) return Promise.reject({ status: 404, msg: 'Not found'});
+  });
 }

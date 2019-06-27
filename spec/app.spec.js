@@ -388,48 +388,52 @@ describe('/api/articles', () => {
           });
       });
     });
-    describe.only('POST', () => {
+    describe('POST', () => {
       it('status:201 responds with the created object', () => {
         return request
-        .post('/api/articles/1/comments')
-        .send({username: 'lurker', body: 'Damn fine cup of coffee!'})
-        .expect(201)
-        .then(({ body: { comment } }) => {
-          expect(comment).to.have.keys(...commentKeys, 'article_id');
-          expect(comment.votes).to.equal(0);
-          expect(comment.author).to.equal('lurker');
-          expect(comment.body).to.equal('Damn fine cup of coffee!')
-        });
+          .post('/api/articles/1/comments')
+          .send({ username: 'lurker', body: 'Damn fine cup of coffee!' })
+          .expect(201)
+          .then(({ body: { comment } }) => {
+            expect(comment).to.have.keys(...commentKeys, 'article_id');
+            expect(comment.votes).to.equal(0);
+            expect(comment.author).to.equal('lurker');
+            expect(comment.body).to.equal('Damn fine cup of coffee!');
+          });
       });
       it('status:400 only accepts comments from registered users', () => {
         return request
-        .post('/api/articles/1/comments')
-        .send({username: 'nemo', body: 'Damn fine cup of coffee!'})
-        .expect(400);
+          .post('/api/articles/1/comments')
+          .send({ username: 'nemo', body: 'Damn fine cup of coffee!' })
+          .expect(400);
       });
       it('status:400 only accepts comments on an existing article', () => {
         return request
-        .post('/api/articles/100/comments')
-        .send({username: 'lurker', body: 'Damn fine cup of coffee!'})
-        .expect(404);
+          .post('/api/articles/100/comments')
+          .send({ username: 'lurker', body: 'Damn fine cup of coffee!' })
+          .expect(404);
       });
       it('status:400 invalid article id', () => {
         return request
-        .post('/api/articles/gaaaarrr/comments')
-        .send({username: 'lurker', body: 'Damn fine cup of coffee!'})
-        .expect(400);
+          .post('/api/articles/gaaaarrr/comments')
+          .send({ username: 'lurker', body: 'Damn fine cup of coffee!' })
+          .expect(400);
       });
       it('status:400 missing data', () => {
         return request
-        .post('/api/articles/1/comments')
-        .send({username: 'lurker'})
-        .expect(400);
+          .post('/api/articles/1/comments')
+          .send({ username: 'lurker' })
+          .expect(400);
       });
       it('status:201 ignores extra data', () => {
         return request
-        .post('/api/articles/1/comments')
-        .send({username: 'lurker', body: 'Damn fine cup of coffee!', greeting: 'Hello!'})
-        .expect(201);
+          .post('/api/articles/1/comments')
+          .send({
+            username: 'lurker',
+            body: 'Damn fine cup of coffee!',
+            greeting: 'Hello!'
+          })
+          .expect(201);
       });
     });
     describe('disallowed methods', () => {
@@ -445,12 +449,52 @@ describe('/api/articles', () => {
   });
 });
 
-describe('/api/comments/:comment_id', () => {
+describe.only('/api/comments/:comment_id', () => {
   beforeEach(() => {
     return knex.seed.run();
   });
+  const commentKeys = ['comment_id', 'votes', 'created_at', 'author', 'body', 'article_id'];
   describe('PATCH', () => {
-    //test
+    it('status:200 responds with updated comment object', () => {
+      return request
+        .patch('/api/comments/2')
+        .send({ inc_votes: 1 })
+        .expect(200)
+        .then(({ body: { comment } }) => {
+          expect(comment).to.have.keys(...commentKeys);          
+          expect(comment.comment_id).to.equal(2);
+          expect(comment.votes).to.equal(15);
+        });
+    });
+    it('status:200 ignores extra data', () => {
+      return request
+        .patch('/api/comments/2')
+        .send({ inc_votes: 1, msg: 'Good comment!' })
+        .expect(200)
+        .then(({ body: { comment } }) => {
+          expect(comment).to.have.keys(...commentKeys);          
+          expect(comment.comment_id).to.equal(2);
+          expect(comment.votes).to.equal(15);
+        });
+    });
+    it('status:422 non-existent comment_id', () => {
+      return request
+      .patch('/api/comments/1000')
+      .send({ inc_votes: 1 })
+      .expect(422);
+    });
+    it('status:400 missing data', () => {
+      return request
+      .patch('/api/comments/2')
+      .send({})
+      .expect(400);
+    });
+    it('status:400 invalid data', () => {
+      return request
+      .patch('/api/comments/two')
+      .send({})
+      .expect(400);
+    });
   });
   describe('DELETE', () => {
     //test

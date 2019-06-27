@@ -119,7 +119,7 @@ describe('/api/articles', () => {
         });
       });
     });
-    describe('GET with queries', () => {
+    describe('GET with sorting queries', () => {
       it('status:200 can be sorted by specified column', () => {
         return request
         .get('/api/articles?sort_by=comment_count')
@@ -163,6 +163,17 @@ describe('/api/articles', () => {
         .expect(200)
         .then(({ body: { articles } }) => {
           expect(articles).to.be.ascendingBy('votes');
+        });
+      });
+    });
+    describe('GET with filtering queries', () => {
+      it('status:200 can be filtered by author', () => {
+        return request
+        .get('/api/articles?author=butter_bridge')
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles.length).to.equal(3);
+          articles.every(article => expect(article.author) === 'butter_bridge');
         });
       });
     });

@@ -1,7 +1,7 @@
 const knex = require('../connection');
 const { validateOrderKey } = require('../db/utils/utils');
 
-exports.fetchArticles = ({ sort_by, order }) => {
+exports.fetchArticles = ({ sort_by, order, author }) => {
   const columns = [
     'article_id',
     'topic',
@@ -20,7 +20,10 @@ exports.fetchArticles = ({ sort_by, order }) => {
       .count('comments.comment_id as comment_count')
       .leftJoin('comments', 'articles.article_id', 'comments.article_id')
       .groupBy('articles.article_id')
-      .orderBy(orderKey, sortOrder);
+      .orderBy(orderKey, sortOrder)
+      .modify(query => {
+        if (author) query.where('articles.author', '=', author);
+      });
   });
 };
 

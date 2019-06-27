@@ -82,15 +82,14 @@ describe('/api/articles', () => {
   const articleKeys = [
     'article_id',
     'title',
-    'body',
     'votes',
     'topic',
     'author',
     'created_at',
     'comment_count'
   ];
-  xdescribe('/', () => {
-    describe('GET', () => {
+  describe('/', () => {
+    describe('GET default behaviour', () => {
       it('status:200 responds with array of article objects', () => {
         return request
           .get('/api/articles')
@@ -110,6 +109,61 @@ describe('/api/articles', () => {
             expect(testArt.author).to.equal('butter_bridge');
             expect(testArt.comment_count).to.equal(2);
           });
+      });
+      it('status:200 default sorting is descending by created_at', () => {
+        return request
+        .get('/api/articles')
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).to.be.descendingBy('created_at');
+        });
+      });
+    });
+    describe('GET with queries', () => {
+      it('status:200 can be sorted by specified column', () => {
+        return request
+        .get('/api/articles?sort_by=comment_count')
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).to.be.descendingBy('comment_count');
+        });
+      });
+      it('status:200 can be sorted in a specified order', () => {
+        return request
+        .get('/api/articles?order=asc')
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).to.be.ascendingBy('created_at');
+        });
+      });
+      it('status:200 ignores unknown query keys', () => {
+        return request
+        .get('/api/articles?random=true')
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).to.be.descendingBy('created_at');
+        });
+      });
+      it('status:400 invalid sort_by value', () => {
+        return request
+        .get('/api/articles?sort_by=age')
+        .expect(400);
+      });
+      it('status:200 ignores unknown sort orders', () => {
+        return request
+        .get('/api/articles?order=random')
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).to.be.descendingBy('created_at');
+        });
+      });
+      it('status:200 sort_by and order can be combined', () => {
+        return request
+        .get('/api/articles?sort_by=votes&order=asc')
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).to.be.ascendingBy('votes');
+        });
       });
     });
     describe('disallowed methods', () => {
@@ -212,7 +266,7 @@ describe('/api/articles', () => {
     'author',
     'body'
   ];
-  describe('/:article_id/comments', () => {
+  xdescribe('/:article_id/comments', () => {
     describe('GET', () => {
       it('status:200 responds with array of comment objects', () => {
         return request

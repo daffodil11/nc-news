@@ -454,6 +454,22 @@ describe.only('/api/comments/:comment_id', () => {
     return knex.seed.run();
   });
   const commentKeys = ['comment_id', 'votes', 'created_at', 'author', 'body', 'article_id'];
+  describe.only('GET', () => {
+    it('status:200 responds with a comment object', () => {
+      return request.get('/api/comments/2')
+      .expect(200)
+      .then(({ body: { comment } }) => {
+        expect(comment).to.have.keys(...commentKeys);
+        expect(comment.body).to.equal('The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.');
+      });
+    });
+    it('status:404 non-existent comment_id', () => {
+      return request.get('/api/comments/200').expect(404);
+    });
+    it('status:400 invalid comment_id', () => {
+      return request.get('/api/comments/cats').expect(400);
+    });
+  });
   describe('PATCH', () => {
     it('status:200 responds with updated comment object', () => {
       return request
@@ -497,6 +513,17 @@ describe.only('/api/comments/:comment_id', () => {
     });
   });
   describe('DELETE', () => {
+    it('status:204 no body on successful deletion', () => {
+      return request
+      .del('/api/comments/2')
+      .expect(204)
+      // .then(() => {
+      //   return request
+      //   .get()
+      // })
+    });
+  });
+  describe('disallowed methods', () => {
     //test
   });
 });

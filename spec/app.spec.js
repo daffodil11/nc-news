@@ -123,7 +123,7 @@ describe('/api/articles', () => {
       });
     });
   });
-  describe('/:article_id', () => {
+  xdescribe('/:article_id', () => {
     describe('GET', () => {
       it('status:200 responds with article object', () => {
         return request
@@ -257,7 +257,44 @@ describe('/api/articles', () => {
         .expect(200)
         .then(({ body: { comments } }) => {
           expect(comments).to.be.descendingBy('votes');
-        })
+        });
+      });
+      it('status:200 ignores invalid query keys', () => {
+        return request
+        .get('/api/articles/1/comments?random=true')
+        .expect(200)
+        .then(({ body: { comments } }) => {
+          expect(comments).to.be.descendingBy('created_at');
+        });
+      });
+      it('status:400 invalid sort_by value', () => {
+        return request
+        .get('/api/articles/1/comments?sort_by=age')
+        .expect(400);
+      });
+      it('status:200 responds with array of comment objects in specified order', () => {
+        return request
+        .get('/api/articles/1/comments?order=asc')
+        .expect(200)
+        .then(({ body: { comments } }) => {
+          expect(comments).to.be.ascendingBy('created_at');
+        });
+      });
+      it('status:200 ignores any order other than asc or desc', () => {
+        return request
+        .get('/api/articles/1/comments?order=random')
+        .expect(200)
+        .then(({ body: { comments } }) => {
+          expect(comments).to.be.descendingBy('created_at');
+        });
+      });
+      it('status:200 sort_by and order can be combined', () => {
+        return request
+        .get('/api/articles/1/comments?sort_by=votes&order=asc')
+        .expect(200)
+        .then(({ body: { comments } }) => {
+          expect(comments).to.be.ascendingBy('votes');
+        });
       });
     });
     describe('POST', () => {

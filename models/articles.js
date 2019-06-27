@@ -36,17 +36,19 @@ exports.updateArticle = (article_id, inc_votes) => {
     });
 };
 
-exports.fetchArticleComments = (article_id, { sort_by }) => {
+exports.fetchArticleComments = (article_id, { sort_by, order }) => {
   if (/\D/.test(article_id)) {
     return Promise.reject({ status: 400, msg: 'Invalid article_id' });
   }
   const columns = ['comment_id', 'author', 'votes', 'created_at', 'body'].map(col => `comments.${col}`);
   const orderKey = (sort_by) ? `comments.${sort_by}` : 'comments.created_at';
+  const sortOrder = (order === 'asc') ? 'asc' : 'desc';
+  if (!columns.includes(orderKey)) return Promise.reject({status: 400, msg: 'Bad request: Invalid sort_by value'});
   return knex('articles')
     .select(...columns)
     .leftJoin('comments', 'articles.article_id', 'comments.article_id')
     .where('articles.article_id', '=', article_id)
-    .orderBy(orderKey, 'desc')
+    .orderBy(orderKey, sortOrder)
     .then(rows => {
         if (!rows.length) return Promise.reject({ status: 404, msg: 'Not found' });
         else if (Object.values(rows[0]).every(val => val == null)) return [];

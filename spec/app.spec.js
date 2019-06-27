@@ -10,6 +10,9 @@ const { topicData, userData } = require('../db');
 after(() => {
   return knex.destroy();
 });
+before(() => {
+  return knex.seed.run();
+});
 
 describe('/api/badroute', () => {
   it('404 error on non-existent route', () => {
@@ -314,6 +317,7 @@ describe('/api/articles', () => {
           .get('/api/articles/5/comments')
           .expect(200)
           .then(({ body: { comments } }) => {
+            console.log(comments);
             comments.every(comment =>
               expect(comment).to.have.keys(...commentKeys)
             );
@@ -550,8 +554,22 @@ describe('/api/comments/:comment_id', () => {
   });
 });
 
-describe('/api', () => {
+describe.only('/api', () => {
+  const endpoints = [
+    'GET /api',
+    'GET /api/topics',
+    'GET /api/articles',
+    'GET /api/users/:username',
+    'GET /api/articles/:article_id/comments'
+  ];
   describe('GET', () => {
-    //test
+    it('status:200 responds with endpoints object', () => {
+      return request
+        .get('/api')
+        .expect(200)
+        .then(({ body }) => {
+          expect(body).to.have.keys(...endpoints);
+        });
+    });
   });
 });

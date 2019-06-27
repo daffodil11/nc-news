@@ -16,9 +16,11 @@ describe('/api/badroute', () => {
     const methods = ['get', 'post', 'put', 'patch', 'del'];
     return Promise.all(
       methods.map(method => {
-        return request[method]('/api/badroute').expect(404).then(({ body }) => {
-          expect(body.msg).to.equal('Not found');
-        });
+        return request[method]('/api/badroute')
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).to.equal('Not found');
+          });
       })
     );
   });
@@ -112,92 +114,100 @@ describe('/api/articles', () => {
       });
       it('status:200 default sorting is descending by created_at', () => {
         return request
-        .get('/api/articles')
-        .expect(200)
-        .then(({ body: { articles } }) => {
-          expect(articles).to.be.descendingBy('created_at');
-        });
+          .get('/api/articles')
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).to.be.descendingBy('created_at');
+          });
       });
     });
     describe('GET with sorting queries', () => {
       it('status:200 can be sorted by specified column', () => {
         return request
-        .get('/api/articles?sort_by=comment_count')
-        .expect(200)
-        .then(({ body: { articles } }) => {
-          expect(articles).to.be.descendingBy('comment_count');
-        });
+          .get('/api/articles?sort_by=comment_count')
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).to.be.descendingBy('comment_count');
+          });
       });
       it('status:200 can be sorted in a specified order', () => {
         return request
-        .get('/api/articles?order=asc')
-        .expect(200)
-        .then(({ body: { articles } }) => {
-          expect(articles).to.be.ascendingBy('created_at');
-        });
+          .get('/api/articles?order=asc')
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).to.be.ascendingBy('created_at');
+          });
       });
       it('status:200 ignores unknown query keys', () => {
         return request
-        .get('/api/articles?random=true')
-        .expect(200)
-        .then(({ body: { articles } }) => {
-          expect(articles).to.be.descendingBy('created_at');
-        });
+          .get('/api/articles?random=true')
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).to.be.descendingBy('created_at');
+          });
       });
       it('status:400 invalid sort_by value', () => {
-        return request
-        .get('/api/articles?sort_by=age')
-        .expect(400);
+        return request.get('/api/articles?sort_by=age').expect(400);
       });
       it('status:200 ignores unknown sort orders', () => {
         return request
-        .get('/api/articles?order=random')
-        .expect(200)
-        .then(({ body: { articles } }) => {
-          expect(articles).to.be.descendingBy('created_at');
-        });
+          .get('/api/articles?order=random')
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).to.be.descendingBy('created_at');
+          });
       });
       it('status:200 sort_by and order can be combined', () => {
         return request
-        .get('/api/articles?sort_by=votes&order=asc')
-        .expect(200)
-        .then(({ body: { articles } }) => {
-          expect(articles).to.be.ascendingBy('votes');
-        });
+          .get('/api/articles?sort_by=votes&order=asc')
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).to.be.ascendingBy('votes');
+          });
       });
     });
-    describe.only('GET with filtering queries', () => {
+    describe('GET with filtering queries', () => {
       it('status:200 can be filtered by author', () => {
         return request
-        .get('/api/articles?author=butter_bridge')
-        .expect(200)
-        .then(({ body: { articles } }) => {
-          expect(articles.length).to.equal(3);
-          articles.every(article => expect(article.author) === 'butter_bridge');
-        });
+          .get('/api/articles?author=butter_bridge')
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles.length).to.equal(3);
+            articles.every(
+              article => expect(article.author) === 'butter_bridge'
+            );
+            articles.every(article =>
+              expect(article).to.have.keys(articleKeys)
+            );
+          });
       });
       it('status:200 can be filtered by topic', () => {
         return request
-        .get('/api/articles?topic=mitch')
-        .expect(200)
-        .then(({ body: { articles } }) => {
-          expect(articles.length).to.equal(11);
-          articles.every(article => expect(article.topic) === 'mitch');
-        });
+          .get('/api/articles?topic=mitch')
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles.length).to.equal(11);
+            articles.every(article => expect(article.topic) === 'mitch');
+            articles.every(article =>
+              expect(article).to.have.keys(articleKeys)
+            );
+          });
       });
       it('status:200 responds with an empty array if the author is not found', () => {
-        return request.get('/api/articles?author=tolkien')
-        .expect(200)
-        .then(({ body: { articles } }) => {
-          expect(articles).to.deep.equal([]);
-        });
+        return request
+          .get('/api/articles?author=tolkien')
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).to.deep.equal([]);
+          });
       });
       it('status:200 responds with an empty array if the topic is not found', () => {
-        return request.get('/api/articles?topic=trees')
-        .expect(200)
-        .then(({ body: { articles } }) => {
-          expect(articles).to.deep.equal([]);
-        });
+        return request
+          .get('/api/articles?topic=trees')
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).to.deep.equal([]);
+          });
       });
     });
     describe('disallowed methods', () => {
@@ -257,7 +267,10 @@ describe('/api/articles', () => {
       it('status:200 ignores extra data', () => {
         return request
           .patch('/api/articles/5')
-          .send({ inc_votes: -4, comment: 'your article is bad and you should feel bad' })
+          .send({
+            inc_votes: -4,
+            comment: 'your article is bad and you should feel bad'
+          })
           .expect(200)
           .then(({ body: { article } }) => {
             expect(article.votes).to.equal(-4);
@@ -293,100 +306,114 @@ describe('/api/articles', () => {
       });
     });
   });
-  const commentKeys = [
-    'comment_id',
-    'votes',
-    'created_at',
-    'author',
-    'body'
-  ];
+  const commentKeys = ['comment_id', 'votes', 'created_at', 'author', 'body'];
   describe('/:article_id/comments', () => {
     describe('GET', () => {
       it('status:200 responds with array of comment objects', () => {
         return request
-        .get('/api/articles/5/comments')
-        .expect(200)
-        .then(({ body: { comments } }) => {
-          comments.every(comment => expect(comment).to.have.keys(...commentKeys));
-          expect(comments.length).to.equal(2);
-        });
+          .get('/api/articles/5/comments')
+          .expect(200)
+          .then(({ body: { comments } }) => {
+            comments.every(comment =>
+              expect(comment).to.have.keys(...commentKeys)
+            );
+            expect(comments.length).to.equal(2);
+          });
       });
       it('status:200 responds with an empty array if an article has no comments', () => {
         return request
-        .get('/api/articles/2/comments')
-        .expect(200)
-        .then(({ body: { comments } }) => {
-          expect(comments).to.deep.equal([]);
-        });
+          .get('/api/articles/2/comments')
+          .expect(200)
+          .then(({ body: { comments } }) => {
+            expect(comments).to.deep.equal([]);
+          });
       });
       it('status:200 default sort is created_at descending', () => {
         return request
-        .get('/api/articles/5/comments')
-        .expect(200)
-        .then(({ body: { comments } }) => {
-          expect(comments).to.be.descendingBy('created_at');
-        });
-      })
+          .get('/api/articles/5/comments')
+          .expect(200)
+          .then(({ body: { comments } }) => {
+            expect(comments).to.be.descendingBy('created_at');
+          });
+      });
       it('status:404 non-existent article_id', () => {
-        return request
-        .get('/api/articles/100/comments')
-        .expect(404);
+        return request.get('/api/articles/100/comments').expect(404);
       });
       it('status:400 invalid article_id', () => {
-        return request
-        .get('/api/articles/pizza/comments')
-        .expect(400);
+        return request.get('/api/articles/pizza/comments').expect(400);
       });
     });
     describe('GET with queries', () => {
       it('status:200 responds with array of comment objects sorted by specified value', () => {
         return request
-        .get('/api/articles/1/comments?sort_by=votes')
-        .expect(200)
-        .then(({ body: { comments } }) => {
-          expect(comments).to.be.descendingBy('votes');
-        });
+          .get('/api/articles/1/comments?sort_by=votes')
+          .expect(200)
+          .then(({ body: { comments } }) => {
+            expect(comments).to.be.descendingBy('votes');
+          });
       });
       it('status:200 ignores invalid query keys', () => {
         return request
-        .get('/api/articles/1/comments?random=true')
-        .expect(200)
-        .then(({ body: { comments } }) => {
-          expect(comments).to.be.descendingBy('created_at');
-        });
+          .get('/api/articles/1/comments?random=true')
+          .expect(200)
+          .then(({ body: { comments } }) => {
+            expect(comments).to.be.descendingBy('created_at');
+          });
       });
       it('status:400 invalid sort_by value', () => {
-        return request
-        .get('/api/articles/1/comments?sort_by=age')
-        .expect(400);
+        return request.get('/api/articles/1/comments?sort_by=age').expect(400);
       });
       it('status:200 responds with array of comment objects in specified order', () => {
         return request
-        .get('/api/articles/1/comments?order=asc')
-        .expect(200)
-        .then(({ body: { comments } }) => {
-          expect(comments).to.be.ascendingBy('created_at');
-        });
+          .get('/api/articles/1/comments?order=asc')
+          .expect(200)
+          .then(({ body: { comments } }) => {
+            expect(comments).to.be.ascendingBy('created_at');
+          });
       });
       it('status:200 ignores any order other than asc or desc', () => {
         return request
-        .get('/api/articles/1/comments?order=random')
-        .expect(200)
-        .then(({ body: { comments } }) => {
-          expect(comments).to.be.descendingBy('created_at');
-        });
+          .get('/api/articles/1/comments?order=random')
+          .expect(200)
+          .then(({ body: { comments } }) => {
+            expect(comments).to.be.descendingBy('created_at');
+          });
       });
       it('status:200 sort_by and order can be combined', () => {
         return request
-        .get('/api/articles/1/comments?sort_by=votes&order=asc')
-        .expect(200)
-        .then(({ body: { comments } }) => {
-          expect(comments).to.be.ascendingBy('votes');
-        });
+          .get('/api/articles/1/comments?sort_by=votes&order=asc')
+          .expect(200)
+          .then(({ body: { comments } }) => {
+            expect(comments).to.be.ascendingBy('votes');
+          });
       });
     });
-    describe('POST', () => {
-      //test
+    describe.only('POST', () => {
+      it('status:201 responds with the created object', () => {
+        return request
+        .post('/api/articles/1/comments')
+        .send({username: 'lurker', body: 'Damn fine cup of coffee!'})
+        .expect(201)
+        .then(({ body: { comment } }) => {
+          expect(comment).to.have.keys(...commentKeys, 'article_id');
+          expect(comment.votes).to.equal(0);
+          expect(comment.author).to.equal('lurker');
+          expect(comment.body).to.equal('Damn fine cup of coffee!')
+        });
+      });
+      it('status:400 only accepts comments from registered users', () => {
+        //test
+      })
+    });
+    describe.only('disallowed methods', () => {
+      it('status:405', () => {
+        const methods = ['patch', 'put', 'del'];
+        return Promise.all(
+          methods.map(method => {
+            return request[method]('/api/articles/3/comments').expect(405);
+          })
+        );
+      });
     });
   });
 });

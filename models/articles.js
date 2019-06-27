@@ -1,13 +1,13 @@
 const knex = require('../connection');
 const { validateOrderKey } = require('../db/utils/utils');
 
-const _fetchArticles = (columns) => {
-    return knex('articles')
-      .select(...columns)
-      .count('comments.comment_id as comment_count')
-      .leftJoin('comments', 'articles.article_id', 'comments.article_id')
-      .groupBy('articles.article_id');
-}
+const _fetchArticles = columns => {
+  return knex('articles')
+    .select(...columns)
+    .count('comments.comment_id as comment_count')
+    .leftJoin('comments', 'articles.article_id', 'comments.article_id')
+    .groupBy('articles.article_id');
+};
 
 exports.fetchArticles = ({ sort_by, order, author, topic }) => {
   const columns = [

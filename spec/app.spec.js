@@ -166,7 +166,7 @@ describe('/api/articles', () => {
         });
       });
     });
-    describe('GET with filtering queries', () => {
+    describe.only('GET with filtering queries', () => {
       it('status:200 can be filtered by author', () => {
         return request
         .get('/api/articles?author=butter_bridge')
@@ -174,6 +174,29 @@ describe('/api/articles', () => {
         .then(({ body: { articles } }) => {
           expect(articles.length).to.equal(3);
           articles.every(article => expect(article.author) === 'butter_bridge');
+        });
+      });
+      it('status:200 can be filtered by topic', () => {
+        return request
+        .get('/api/articles?topic=mitch')
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles.length).to.equal(11);
+          articles.every(article => expect(article.topic) === 'mitch');
+        });
+      });
+      it('status:200 responds with an empty array if the author is not found', () => {
+        return request.get('/api/articles?author=tolkien')
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).to.deep.equal([]);
+        });
+      });
+      it('status:200 responds with an empty array if the topic is not found', () => {
+        return request.get('/api/articles?topic=trees')
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).to.deep.equal([]);
         });
       });
     });

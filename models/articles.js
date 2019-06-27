@@ -9,7 +9,7 @@ const _fetchArticles = (columns) => {
       .groupBy('articles.article_id');
 }
 
-exports.fetchArticles = ({ sort_by, order, author }) => {
+exports.fetchArticles = ({ sort_by, order, author, topic }) => {
   const columns = [
     'article_id',
     'topic',
@@ -27,6 +27,7 @@ exports.fetchArticles = ({ sort_by, order, author }) => {
       .orderBy(orderKey, sortOrder)
       .modify(query => {
         if (author) query.where('articles.author', '=', author);
+        if (topic) query.where('articles.topic', '=', topic);
       });
   });
 };

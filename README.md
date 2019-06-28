@@ -1,8 +1,6 @@
 # NC News (or, Have I Got NC for You?)
 
-This is the backend for a website on which users can read articles, comment on articles and vote on articles and comments. This is a portfolio project and is not actively maintained.
-
-It is hosted [here](https://have-i-got-nc-for-you.herokuapp.com/api/).
+This is the backend for a website on which users can read articles, comment on articles and vote on articles and comments. This is a portfolio project and is not actively maintained. It is hosted [here](https://have-i-got-nc-for-you.herokuapp.com/api/).
 
 ## Getting Started
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See [deployment](#deployment) for notes on how to deploy the project on a live system.

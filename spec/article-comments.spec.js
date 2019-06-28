@@ -1,40 +1,13 @@
-process.env.NODE_ENV = 'test';
-const app = require('../app');
-const request = require('supertest')(app);
 const chai = require('chai');
 chai.use(require('chai-sorted'));
 const { expect } = chai;
-const knex = require('../connection');
-const { topicData, userData } = require('../db');
-const testTopics = require('./topics.spec');
-const testApi = require('./api.spec');
-const testUsersUsername = require('./users.spec');
-const testArticles = require('./articles.spec');
-const testArticlesArticleId = require('./article-by-id.spec');
-const testArticleComments = require('./article-comments.spec');
 
-after(() => {
-  return knex.destroy();
-});
-before(() => {
-  return knex.seed.run();
-});
-
-describe.only('/api', () => {
-  testApi(request);
-  testTopics(request);
-  testUsersUsername(request);
-  testArticles(request);
-  testArticlesArticleId(request, knex);
-  testArticleComments(request, knex);
-});
-
-describe('/api/articles', () => {
+module.exports = (request, knex) => {
   beforeEach(() => {
-    return knex.seed.run();
+      return knex.seed.run();
   });
   const commentKeys = ['comment_id', 'votes', 'created_at', 'author', 'body'];
-  describe('/:article_id/comments', () => {
+  describe('/articles/:article_id/comments', () => {
     describe('GET', () => {
       it('status:200 responds with array of comment objects', () => {
         return request
@@ -174,106 +147,4 @@ describe('/api/articles', () => {
       });
     });
   });
-});
-
-describe('/api/comments/:comment_id', () => {
-  beforeEach(() => {
-    return knex.seed.run();
-  });
-  const commentKeys = [
-    'comment_id',
-    'votes',
-    'created_at',
-    'author',
-    'body',
-    'article_id'
-  ];
-  describe('GET', () => {
-    it('status:200 responds with a comment object', () => {
-      return request
-        .get('/api/comments/2')
-        .expect(200)
-        .then(({ body: { comment } }) => {
-          expect(comment).to.have.keys(...commentKeys);
-          expect(comment.body).to.equal(
-            'The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.'
-          );
-        });
-    });
-    it('status:404 non-existent comment_id', () => {
-      return request.get('/api/comments/200').expect(404);
-    });
-    it('status:400 invalid comment_id', () => {
-      return request.get('/api/comments/cats').expect(400);
-    });
-  });
-  describe('PATCH', () => {
-    it('status:200 responds with updated comment object', () => {
-      return request
-        .patch('/api/comments/2')
-        .send({ inc_votes: 1 })
-        .expect(200)
-        .then(({ body: { comment } }) => {
-          expect(comment).to.have.keys(...commentKeys);
-          expect(comment.comment_id).to.equal(2);
-          expect(comment.votes).to.equal(15);
-        });
-    });
-    it('status:200 ignores extra data', () => {
-      return request
-        .patch('/api/comments/2')
-        .send({ inc_votes: 1, msg: 'Good comment!' })
-        .expect(200)
-        .then(({ body: { comment } }) => {
-          expect(comment).to.have.keys(...commentKeys);
-          expect(comment.comment_id).to.equal(2);
-          expect(comment.votes).to.equal(15);
-        });
-    });
-    it('status:422 non-existent comment_id', () => {
-      return request
-        .patch('/api/comments/1000')
-        .send({ inc_votes: 1 })
-        .expect(422);
-    });
-    it('status:400 missing data', () => {
-      return request
-        .patch('/api/comments/2')
-        .send({})
-        .expect(400);
-    });
-    it('status:400 invalid data', () => {
-      return request
-        .patch('/api/comments/two')
-        .send({})
-        .expect(400);
-    });
-  });
-  describe('DELETE', () => {
-    it('status:204 no body on successful deletion', () => {
-      return request
-        .del('/api/comments/2')
-        .expect(204)
-        .then(() => {
-          return request.get('/api/comments/2').expect(404);
-        });
-    });
-    it('status:404 non-existent comment_id', () => {
-      return request.del('/api/comments/200').expect(404);
-    });
-    it('status:400 invalid comment_id', () => {
-      return request.del('/api/comments/cats').expect(400);
-    });
-  });
-  describe('disallowed methods', () => {
-    it('status:405', () => {
-      const methods = ['post', 'put'];
-      return Promise.all(
-        methods.map(method => {
-          return request[method]('/api/comments/2').expect(405);
-        })
-      );
-    });
-  });
-});
-
+};

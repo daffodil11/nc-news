@@ -27,6 +27,9 @@ exports.addComment = (article_id, { username, body }) => {
 };
 
 exports.updateCommentVotes = (comment_id, { inc_votes }) => {
+  if (/\D/.test(comment_id)) {
+    return Promise.reject({ status: 400, msg: 'Invalid comment_id' });
+  }
   if (!inc_votes || !Number.isInteger(inc_votes))
     return Promise.reject({ status: 400, msg: 'Bad request' });
   return knex('comments')

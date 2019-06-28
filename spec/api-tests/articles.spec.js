@@ -12,7 +12,7 @@ module.exports = request => {
     'created_at',
     'comment_count'
   ];
-  describe.only('/articles', () => {
+  describe('/articles', () => {
     describe('GET default behaviour', () => {
       it('status:200 responds with array of article objects', () => {
         return request

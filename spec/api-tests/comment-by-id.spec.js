@@ -67,10 +67,10 @@ module.exports = (request, knex) => {
           .send({})
           .expect(400);
       });
-      it('status:400 invalid data', () => {
+      it('status:400 invalid id', () => {
         return request
           .patch('/api/comments/two')
-          .send({})
+          .send({ inc_votes: 1 })
           .expect(400);
       });
     });

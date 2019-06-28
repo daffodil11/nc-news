@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 
 module.exports = request => {
-  describe('/', () => {
+  describe.only('/', () => {
     describe('GET', () => {
       const endpoints = [
         'GET /api',
@@ -9,8 +9,12 @@ module.exports = request => {
         'GET /api/users/:username',
         'GET /api/articles',
         'GET /api/articles/:article_id',
+        'PATCH /api/articles/:article_id',
         'GET /api/articles/:article_id/comments',
-        'GET /api/comments/:comment_id'
+        'POST /api/articles/:article_id/comments',
+        'GET /api/comments/:comment_id',
+        'PATCH /api/comments/:comment_id',
+        'DELETE /api/comments/:comment_id',
       ];
       it('status:200 responds with endpoints object', () => {
         return request

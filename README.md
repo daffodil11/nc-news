@@ -48,5 +48,8 @@ Wait, really?! You want to contribute? You know it's just a portfolio project, r
 ## Authors
 Simon Davey
 
+## Acknowledgements
+This project was developed under the tuition of [Northcoders](https://northcoders.com/).
+
 ## License
 This project is licensed under the MIT License - see the [LICENSE.txt](LICENSE.txt) file for details

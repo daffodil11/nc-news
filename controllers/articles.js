@@ -4,7 +4,10 @@ const { addComment } = require('../models/comments');
 exports.sendArticles = (req, res, next) => {
     fetchArticles(req.query)
     .then(articles => {
-        res.status(200).send({ articles });
+        return { articles, total_count: articles.length }
+    })
+    .then(resBody => {
+        res.status(200).send(resBody);
     })
     .catch(next);
 }

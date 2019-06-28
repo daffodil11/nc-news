@@ -12,13 +12,14 @@ module.exports = request => {
     'created_at',
     'comment_count'
   ];
-  describe('/articles', () => {
+  describe.only('/articles', () => {
     describe('GET default behaviour', () => {
       it('status:200 responds with array of article objects', () => {
         return request
           .get('/api/articles')
           .expect(200)
-          .then(({ body: { articles } }) => {
+          .then(({ body }) => {
+            const articles = body.articles;
             // Shallow test whole array
             articles.every(article =>
               expect(article).to.have.keys(...articleKeys)
@@ -32,6 +33,7 @@ module.exports = request => {
             expect(testArt.votes).to.equal(0);
             expect(testArt.author).to.equal('butter_bridge');
             expect(testArt.comment_count).to.equal(2);
+            expect(body.total_count).to.equal(12);
           });
       });
       it('status:200 default sorting is descending by created_at', () => {
@@ -42,6 +44,15 @@ module.exports = request => {
             expect(articles).to.be.descendingBy('created_at');
           });
       });
+      xit('status:200 default limit of number of articles is 10', () => {
+        return request
+          .get('/api/articles')
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles.length).to.equal(10);
+          });
+      });
+      it('status:200 default start page is 1');
     });
     describe('GET with sorting queries', () => {
       it('status:200 can be sorted by specified column', () => {
@@ -131,6 +142,9 @@ module.exports = request => {
             expect(articles).to.deep.equal([]);
           });
       });
+    });
+    describe('GET with pagination', () => {
+      it('status:200 number of articles returned can be limited using limit query');
     });
     describe('disallowed methods', () => {
       it('status:405', () => {

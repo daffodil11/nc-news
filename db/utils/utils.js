@@ -31,3 +31,7 @@ exports.validateOrderKey = (orderKey, columns) => {
     }
   });
 };
+
+exports.paginate = (arr, limit, page) => {
+  return;
+}

@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const { formatDate, makeRefObj, formatComments } = require('../db/utils/utils');
+const { formatDate, makeRefObj, formatComments, paginate } = require('../db/utils/utils');
 
 describe('formatDate', () => {
   const arr = [
@@ -95,5 +95,15 @@ describe('formatComments', () => {
   it('returns an array of objects with the property created_at converted to a Date object', () => {
     expect(formatComments(arr, refObj)[0].created_at).to.be.an.instanceof(Date);
     expect(formatComments(arr, refObj)[1].created_at).to.be.an.instanceof(Date);
+  });
+});
+
+describe('paginate', () => {
+  const arr = Array.from({length: 42}, (_, i) => { id: i });
+  console.log(arr);
+  it('returns a new array and does not mutate the original', () => {
+    arrCopy = [...arr];
+    expect(paginate(arr)).to.not.equal(arr);
+    expect(arr).to.deep.equal(arrCopy);
   });
 });

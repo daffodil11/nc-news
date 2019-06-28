@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const { topicData } = require('../db');
+const { topicData } = require('../../db');
 
 module.exports = request => {
   describe('/topics', () => {

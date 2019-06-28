@@ -6,13 +6,13 @@ chai.use(require('chai-sorted'));
 const { expect } = chai;
 const knex = require('../connection');
 const { topicData, userData } = require('../db');
-const testTopics = require('./topics.spec');
-const testApi = require('./api.spec');
-const testUsersUsername = require('./users.spec');
-const testArticles = require('./articles.spec');
-const testArticlesArticleId = require('./article-by-id.spec');
-const testArticleComments = require('./article-comments.spec');
-const testCommentsCommentId = require('./comment-by-id.spec');
+const testTopics = require('./api-tests/topics.spec');
+const testApi = require('./api-tests/api.spec');
+const testUsersUsername = require('./api-tests/users.spec');
+const testArticles = require('./api-tests/articles.spec');
+const testArticlesArticleId = require('./api-tests/article-by-id.spec');
+const testArticleComments = require('./api-tests/article-comments.spec');
+const testCommentsCommentId = require('./api-tests/comment-by-id.spec');
 
 describe.only('/api', () => {
   after(() => {

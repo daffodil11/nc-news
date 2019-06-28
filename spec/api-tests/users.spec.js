@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const { userData } = require('../db');
+const { userData } = require('../../db');
 
 module.exports = request => {
   describe('/users/:username', () => {

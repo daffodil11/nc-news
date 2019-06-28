@@ -1,5 +1,7 @@
 const knex = require('../connection');
 const { validateOrderKey } = require('../db/utils/utils');
+const { fetchTopics } = require('./topics');
+const { fetchUsers } = require('./users');
 
 const _fetchArticles = columns => {
   return knex('articles')
@@ -22,14 +24,43 @@ exports.fetchArticles = ({ sort_by, order, author, topic }) => {
     ? `${sort_by === 'comment_count' ? '' : 'articles.'}${sort_by}`
     : 'articles.created_at';
   const sortOrder = order === 'asc' ? 'asc' : 'desc';
-  return validateOrderKey(orderKey, [...columns, 'comment_count']).then(() => {
-    return _fetchArticles(columns)
-      .orderBy(orderKey, sortOrder)
-      .modify(query => {
-        if (author) query.where('articles.author', '=', author);
-        if (topic) query.where('articles.topic', '=', topic);
-      });
-  });
+  return validateOrderKey(orderKey, [...columns, 'comment_count'])
+    .then(() => {
+      const checks = [];
+      if (topic) {
+        checks.push(
+          fetchTopics().then(topics => {
+            const slugs = topics.map(topic => topic.slug);
+            if (!slugs.includes(topic))
+              return Promise.reject({
+                status: 400,
+                msg: 'Bad request: Topic not found'
+              });
+          })
+        );
+      }
+      if (author) {
+        checks.push(
+          fetchUsers().then(users => {
+            const usernames = users.map(user => user.username);
+            if (author && !usernames.includes(author))
+              return Promise.reject({
+                status: 400,
+                msg: 'Bad request: Author not found'
+              });
+          })
+        );
+      }
+      return Promise.all(checks);
+    })
+    .then(() => {
+      return _fetchArticles(columns)
+        .orderBy(orderKey, sortOrder)
+        .modify(query => {
+          if (author) query.where('articles.author', '=', author);
+          if (topic) query.where('articles.topic', '=', topic);
+        });
+    });
 };
 
 const _fetchArticleById = article_id => {

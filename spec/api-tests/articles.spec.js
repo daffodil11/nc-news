@@ -126,21 +126,15 @@ module.exports = request => {
             );
           });
       });
-      it('status:200 responds with an empty array if the author is not found', () => {
+      it('status:400 if the author is not found', () => {
         return request
           .get('/api/articles?author=tolkien')
-          .expect(200)
-          .then(({ body: { articles } }) => {
-            expect(articles).to.deep.equal([]);
-          });
+          .expect(400);
       });
-      it('status:200 responds with an empty array if the topic is not found', () => {
+      it('status:400 if the topic is not found', () => {
         return request
           .get('/api/articles?topic=trees')
-          .expect(200)
-          .then(({ body: { articles } }) => {
-            expect(articles).to.deep.equal([]);
-          });
+          .expect(400);
       });
     });
     describe('GET with pagination', () => {

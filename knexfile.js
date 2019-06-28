@@ -1,9 +1,19 @@
+const { DB_URL } = process.env;
 const ENV = process.env.NODE_ENV || 'development';
 const { dbUsername, dbPassword } = require('./config');
 
-const databases = {
-  development: 'nc_news',
-  test: 'nc_news_test'
+const connections = {
+  development: {
+    database: 'nc_news',
+    username: dbUsername,
+    password: dbPassword
+  },
+  test: {
+    database: 'nc_news_test',
+    username: dbUsername,
+    password: dbPassword
+  },
+  production: `${DB_URL}?ssl=true`
 }
 
 module.exports = {
@@ -14,9 +24,5 @@ module.exports = {
   seeds: {
     directory: './db/seeds'
   },
-  connection: {
-    database: databases[ENV],
-    username: dbUsername,
-    password: dbPassword
-  }
+  connection: connections[ENV]
 };

@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 
 module.exports = request => {
-  describe.only('/', () => {
+  describe('/', () => {
     describe('GET', () => {
       const endpoints = [
         'GET /api',

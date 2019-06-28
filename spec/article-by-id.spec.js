@@ -11,9 +11,6 @@ module.exports = (request, knex) => {
     'comment_count',
     'body'
   ];
-  beforeEach(() => {
-      return knex.seed.run();
-  });
   describe('/articles/:article_id', () => {
     describe('GET', () => {
       it('status:200 responds with article object', () => {
@@ -38,6 +35,9 @@ module.exports = (request, knex) => {
       });
     });
     describe('PATCH', () => {
+      afterEach(() => {
+        return knex.seed.run();
+      });
       it('status:200 changes vote value and responds with updated article object', () => {
         return request
           .patch('/api/articles/5')
@@ -89,6 +89,9 @@ module.exports = (request, knex) => {
       });
     });
     describe('disallowed methods', () => {
+      after(() => {
+          return knex.seed.run();
+      });
       it('status:405', () => {
         const methods = ['post', 'put', 'del'];
         return Promise.all(
@@ -99,5 +102,4 @@ module.exports = (request, knex) => {
       });
     });
   });
-
-}
+};

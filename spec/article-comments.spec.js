@@ -3,19 +3,16 @@ chai.use(require('chai-sorted'));
 const { expect } = chai;
 
 module.exports = (request, knex) => {
-  beforeEach(() => {
-      return knex.seed.run();
-  });
   const commentKeys = ['comment_id', 'votes', 'created_at', 'author', 'body'];
   describe('/articles/:article_id/comments', () => {
-    describe('GET', () => {
+    describe('GET default behaviour', () => {
       it('status:200 responds with array of comment objects', () => {
         return request
           .get('/api/articles/5/comments')
           .expect(200)
           .then(({ body: { comments } }) => {
             comments.every(comment =>
-              expect(comment).to.have.keys(...commentKeys)
+              expect(comment).to.have.keys(commentKeys)
             );
             expect(comments.length).to.equal(2);
           });
@@ -89,6 +86,9 @@ module.exports = (request, knex) => {
       });
     });
     describe('POST', () => {
+      afterEach(() => {
+          return knex.seed.run();
+      });
       it('status:201 responds with the created object', () => {
         return request
           .post('/api/articles/1/comments')
@@ -137,13 +137,16 @@ module.exports = (request, knex) => {
       });
     });
     describe('disallowed methods', () => {
+      after(() => {
+        return knex.seed.run();
+      });
       it('status:405', () => {
         const methods = ['patch', 'put', 'del'];
         return Promise.all(
           methods.map(method => {
             return request[method]('/api/articles/3/comments').expect(405);
           })
-        );
+        )
       });
     });
   });

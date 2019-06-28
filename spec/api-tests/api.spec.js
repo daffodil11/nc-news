@@ -39,5 +39,15 @@ module.exports = request => {
         );
       });
     });
+    describe('disallowed methods', () => {
+      it('status:405', () => {
+        const methods = ['post', 'patch', 'put', 'del'];
+        return Promise.all(
+          methods.map(method => {
+            return request[method]('/api').expect(405);
+          })
+        );
+      })
+    })
   });
 };

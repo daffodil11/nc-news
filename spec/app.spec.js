@@ -554,13 +554,15 @@ describe('/api/comments/:comment_id', () => {
   });
 });
 
-describe.only('/api', () => {
+describe('/api', () => {
   const endpoints = [
     'GET /api',
     'GET /api/topics',
-    'GET /api/articles',
     'GET /api/users/:username',
-    'GET /api/articles/:article_id/comments'
+    'GET /api/articles',
+    'GET /api/articles/:article_id',
+    'GET /api/articles/:article_id/comments',
+    'GET /api/comments/:comment_id'
   ];
   describe('GET', () => {
     it('status:200 responds with endpoints object', () => {

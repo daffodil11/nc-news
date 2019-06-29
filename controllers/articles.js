@@ -1,10 +1,13 @@
 const { fetchArticles, fetchArticleById, updateArticle, fetchArticleComments } = require('../models/articles');
 const { addComment } = require('../models/comments');
+const { paginate } = require('../db/utils/utils');
 
 exports.sendArticles = (req, res, next) => {
-    fetchArticles(req.query)
-    .then(articles => {
-        return { articles, total_count: articles.length }
+    const { limit, p, ...query } = req.query;
+    fetchArticles(query)
+    .then(allArticles => {
+        const articles = paginate(allArticles, limit, p);
+        return { articles, total_count: allArticles.length };
     })
     .then(resBody => {
         res.status(200).send(resBody);

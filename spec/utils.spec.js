@@ -98,12 +98,25 @@ describe('formatComments', () => {
   });
 });
 
-describe('paginate', () => {
-  const arr = Array.from({length: 42}, (_, i) => { id: i });
-  console.log(arr);
+describe.only('paginate', () => {
+  const arr = Array.from({length: 42}, (_, i) => ({ id: i + 1 }));
   it('returns a new array and does not mutate the original', () => {
     arrCopy = [...arr];
+    expect(paginate(arr)).to.be.an('array');
     expect(paginate(arr)).to.not.equal(arr);
     expect(arr).to.deep.equal(arrCopy);
+  });
+  it('defaults to a limit of 10', () => {
+    expect(paginate(arr).length).to.equal(10);
+  });
+  it('defaults to returning the first page', () => {
+    expect(paginate(arr)[0].id).to.equal(1);
+  });
+  it('can change the limit as specified', () => {
+    expect(paginate(arr, 3).length).to.equal(3);
+  });
+  it('can return a specified page', () => {
+    expect(paginate(arr, 10, 2)[0].id).to.equal(11);
+    expect(paginate(arr, 10, 5).length).to.equal(2);
   });
 });

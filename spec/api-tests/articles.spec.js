@@ -12,7 +12,7 @@ module.exports = request => {
     'created_at',
     'comment_count'
   ];
-  describe('/articles', () => {
+  describe.only('/articles', () => {
     describe('GET default behaviour', () => {
       it('status:200 responds with array of article objects', () => {
         return request
@@ -44,15 +44,15 @@ module.exports = request => {
             expect(articles).to.be.descendingBy('created_at');
           });
       });
-      xit('status:200 default limit of number of articles is 10', () => {
+      it('status:200 default limit of number of articles is 10 and default page is 1', () => {
         return request
           .get('/api/articles')
           .expect(200)
           .then(({ body: { articles } }) => {
             expect(articles.length).to.equal(10);
+            expect(articles[0].article_id).to.equal(1);
           });
       });
-      it('status:200 default start page is 1');
     });
     describe('GET with sorting queries', () => {
       it('status:200 can be sorted by specified column', () => {
@@ -116,11 +116,11 @@ module.exports = request => {
       });
       it('status:200 can be filtered by topic', () => {
         return request
-          .get('/api/articles?topic=mitch')
+          .get('/api/articles?topic=cats')
           .expect(200)
           .then(({ body: { articles } }) => {
-            expect(articles.length).to.equal(11);
-            articles.every(article => expect(article.topic) === 'mitch');
+            expect(articles.length).to.equal(1);
+            articles.every(article => expect(article.topic) === 'cats');
             articles.every(article =>
               expect(article).to.have.keys(articleKeys)
             );
@@ -138,7 +138,41 @@ module.exports = request => {
       });
     });
     describe('GET with pagination', () => {
-      it('status:200 number of articles returned can be limited using limit query');
+      it('status:200 number of articles returned can be limited using limit query', () => {
+        return request
+          .get('/api/articles?limit=5')
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles.length).to.equal(5);
+            expect(articles[0].article_id).to.equal(1);
+          });
+      });
+      it('status:400 invalid limit', () => {
+        return request
+          .get('/api/articles?limit=nolimit')
+          .expect(400);
+      });
+      it('status:200 page of articles can be specified', () => {
+        return request
+          .get('/api/articles?p=2')
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles[0].article_id).to.equal(11);
+          });
+      });
+      it('status:400 invalid page', () => {
+        return request
+          .get('/api/articles?p=jimmy')
+          .expect(400);
+      });
+      it('status:200 returns an empty array if specified page exceeds the available number of pages', () => {
+        return request
+          .get('/api/articles?p=20')
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles.length).to.equal(0);
+          });
+      });
     });
     describe('disallowed methods', () => {
       it('status:405', () => {

@@ -32,6 +32,8 @@ exports.validateOrderKey = (orderKey, columns) => {
   });
 };
 
-exports.paginate = (arr, limit, page) => {
-  return;
-}
+exports.paginate = (arr, limit = 10, page = 1) => {
+  if (/\D/.test(limit) || /\D/.test(page)) throw { status: 400, msg: 'Bad request'};
+  const start = limit * (page - 1);
+  return arr.slice(start, start + limit);
+};

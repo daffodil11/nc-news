@@ -13,3 +13,8 @@ exports.fetchUserByUsername = username => {
 exports.fetchUsers = () => {
     return knex('users').select('*');
 };
+
+exports.fetchRandomUser = () => {
+  return this.fetchUsers()
+    .then(userArr => userArr[Math.floor(Math.random() * userArr.length)]);
+}
